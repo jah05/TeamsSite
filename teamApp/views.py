@@ -1,32 +1,70 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+from django.views import View
+from .models import UserTag, Profile, Team, TeamTag
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
 
 loggedIn = True
 
 # Create your views here.
-def index(request):
-    return HttpResponse("hello this is index")
+class IndexView(View):
+    allTeams = Team.objects.order_by("-members_needed")[:6]
 
-def profile(request, profile_id):
-    return HttpResponse("hello this is profile page of user %s" % profile_id)
+    def get(self, request):
+        form = AuthenticationForm()
 
-def edit_profile(request, profile_id):
-    return HttpResponse("hello this is edit profile page for user %s" % profile_id)
+        context = {
+            'form':form,
+            'allTeams': self.allTeams,
+            'user': request.user,
+        }
+        return render(request, 'teamApp/index.html', context)
 
-def teams(request):
-    return HttpResponse("hello this is where the teams are")
+    def post(self, request):
+        pass
 
-def team_profile(request, team_id):
-    return HttpResponse("hello this is the team profile for team %s" %team_id)
+class ProfileView(View):
+    def get(self, request, usr):
+        user = User.objects.get(username = usr)
+        tags = user.userTag_set.all()
+        profile = get_object_or_404(Profile, pk=user)
+        context = {
+            'age': profile.age,
+            'username': usr,
+            'tags': tags,
+            'bio': profile.bio,
+            'city': profile.city
+        }
+        return render(request, 'teamApp/profile.html')
 
-def edit_team(request, team_id):
-    return HttpResponse("hello this is the team editor for team %s" %team_id)
+    def post(self, request):
+        pass
 
-def create(request):
-    return HttpResponse("hello, create your team here")
+class EditProfileView(View):
+    def get(self, request, usr):
+        pass
+    def post(self, request):
+        pass
 
-def recs(request):
-    return HttpResponse("here choose your members")
+class MyTeamsView(View):
+    # return HttpResponse("hello this is where the teams are")
+    pass
 
-def requests(request):
-    return HttpResponse("here you look at your team requests")
+class TeamView(View):
+    # return HttpResponse("hello this is the team profile for team %s" % team_id)
+    pass
+
+class EditTeamView(View):
+    # return HttpResponse("hello this is the team editor for team %s" % team_id)
+    pass
+
+class CreateView(View):
+    # return HttpResponse("hello, create your team here")
+    pass
+
+class RecView(View):
+    pass
+
+class RequestsView(View):
+    pass
