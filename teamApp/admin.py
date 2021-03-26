@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import UserTag, Profile, Team, TeamTag
+from .models import Profile, Team, Tag
 
-admin.site.register(UserTag)
-admin.site.register(TeamTag)
+admin.site.register(Tag)
 admin.site.register(Profile)
 admin.site.register(Team)

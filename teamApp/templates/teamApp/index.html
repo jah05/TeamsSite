@@ -22,6 +22,17 @@
             </div>
             <div class="text">
               {{team.project_description}}
+              Members needed: {{team.members_needed}}
+              Num members: {{team.num_members}}
+              <div>
+                Tags:
+                <ul>
+                  {% for tag in team.tag_set.all %}
+                  <li>{{tag}}</li>
+                  {% endfor %}
+                <ul>
+              </div>
+            </div>
             </div>
           </div>
           {% endfor %}

@@ -10,22 +10,5 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
-    <h1>Profile: {{username}}</h1>
-    <div>age: {{profile.age}}</div>
-    <div>city: {{profile.city}}</div>
-    <div>name: {{profile.name}}</div>
-    <div>bio: {{profile.bio}}</div>
-    <div>skills</div>
-    <ul>
-      {% for tag in profile.user.tag_set.all %}
-      <li>{{tag}}</li>
-      {% endfor %}
-    </ul>
-    <div>teams</div>
-    <ul>
-      {% for team in profile.user.team_set.all %}
-      <li>{{team.project_name}}</li>
-      {% endfor %}
-    </ul>
   </body>
 </html>
