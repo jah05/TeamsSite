@@ -10,5 +10,24 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <div>
+      Team Name: {{team.project_name}}
+    </div>
+    <div>
+      Descritpion: {{team.project_description}}
+    </div>
+    <div>
+      Num Members: {{team.num_members}}
+    </div>
+    <div>
+      Members Needed: {{team.members_needed}}
+    </div>
+    <div>
+      <ul>
+        {% for profile in members %}
+        <li>{{profile.username}}</li>
+        {% endfor %}
+      </ul>
+    <div>
   </body>
 </html>

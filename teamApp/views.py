@@ -13,11 +13,13 @@ class IndexView(View):
 
     def get(self, request):
         form = AuthenticationForm()
+        users = User.objects.all()
 
         context = {
             'form':form,
             'allTeams': self.allTeams,
-            'user': request.user
+            'user': request.user,
+            'users': users
         }
         return render(request, 'teamApp/index.html', context)
 
@@ -31,7 +33,7 @@ class ProfileView(View):
         profile = get_object_or_404(Profile, pk=user)
         context = {
             'username': usr,
-            'profile':profile,
+            'profile': profile,
         }
         return render(request, 'teamApp/profile.html', context)
 
@@ -48,7 +50,11 @@ class MyTeamsView(View):
 class TeamView(View):
     def get(self, request, team_id):
         team = get_object_or_404(Team, pk=team_id)
+        members = team.members_set.all()
+        print(members)
         context = {
+            'team':team,
+            'members': members
         }
         return render(request, 'teamApp/team.html', context)
 

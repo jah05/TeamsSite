@@ -12,32 +12,32 @@
   <body>
     <div>
       <h1>Teams App</h1>
-      {% if user.is_authenticated %}
-        <h3>Here is a catalogue of teams that you might like</h3>
-        <div class="row">
-          {% for team in allTeams %}
-          <div class="col-md-2">
-            <div class="text-primary row">
-              {{team.project_name}}
-            </div>
-            <div class="text">
-              {{team.project_description}}
-              Members needed: {{team.members_needed}}
-              Num members: {{team.num_members}}
-              <div>
-                Tags:
-                <ul>
-                  {% for tag in team.tag_set.all %}
-                  <li>{{tag}}</li>
-                  {% endfor %}
-                <ul>
-              </div>
-            </div>
+      <h3>Here is a catalogue of teams that you might like</h3>
+      <div class="row">
+        {% for team in allTeams %}
+        <div class="col-md-2">
+          <div class="text-primary row">
+            <a href="teams\{{team.id}}">{{team.project_name}}</a>
+          </div>
+          <div class="text">
+            {{team.project_description}}
+            Members needed: {{team.members_needed}}
+            Num members: {{team.num_members}}
+            <div>
+              Tags:
+              <ul>
+                {% for tag in team.tag_set.all %}
+                <li>{{tag}}</li>
+                {% endfor %}
+              <ul>
             </div>
           </div>
-          {% endfor %}
         </div>
-      {% endif %}
+        {% endfor %}
+
+        <h3>Friend Suggestions</h3>
+        
+      </div>
     </div>
   </body>
 </html>
