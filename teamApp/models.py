@@ -18,11 +18,11 @@ class Team(models.Model):
     num_members = models.IntegerField(default=0)
     members_needed = models.IntegerField(default=0)
     project_description = models.TextField(max_length=1000)
-    members = models.ManyToManyField(Profile)
+    members = models.ManyToManyField(User)
     # add photo
 
     def __str__(self):
-        return self.project_name
+        return self.project_name + str(self.members)
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)

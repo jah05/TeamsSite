@@ -50,11 +50,12 @@ class MyTeamsView(View):
 class TeamView(View):
     def get(self, request, team_id):
         team = get_object_or_404(Team, pk=team_id)
-        members = team.members_set.all()
-        print(members)
+        # members = User.objects.filter(username=team.members)
+        # members = team.user_set.all()
+        # print(members)
         context = {
             'team':team,
-            'members': members
+            # 'members': members
         }
         return render(request, 'teamApp/team.html', context)
 
