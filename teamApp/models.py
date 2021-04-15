@@ -22,7 +22,7 @@ class Team(models.Model):
     # add photo
 
     def __str__(self):
-        return self.project_name + str(self.members)
+        return self.project_name
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
