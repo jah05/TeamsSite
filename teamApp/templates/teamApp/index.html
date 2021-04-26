@@ -12,29 +12,45 @@
   <body>
     <div>
       <h1>Teams App</h1>
-      <h3>Here is a catalogue of teams that you might like</h3>
-      <div class="row">
-        {% for team in allTeams %}
-        <div class="col-md-2">
-          <div class="text-primary row">
-            <a href="teams\{{team.id}}">{{team.project_name}}</a>
-          </div>
-          <div class="text">
-            {{team.project_description}}
-            Members needed: {{team.members_needed}}
-            Num members: {{team.num_members}}
-            <div>
-              Tags:
-              <ul>
-                {% for tag in team.tag_set.all %}
-                <li>{{tag}}</li>
-                {% endfor %}
-              <ul>
+      {% if user.is_authenticated %}
+      <form method="POST">
+          {% csrf_token %}          
+          <input type="hidden" name="logout" value="logout"></input>
+          <button type="submit" class="btn btn-primary">Logout</button>
+      </form>
+      {% else %}
+        <form method="POST">
+          {% csrf_token %}
+          <table>
+            {{ form }}
+          </table>
+          <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+        <h3>Here is a catalogue of teams that you might like</h3>
+
+        <div class="row">
+          {% for team in allTeams %}
+          <div class="col-md-2">
+            <div class="text-primary row">
+              <a href="teams\{{team.id}}">{{team.project_name}}</a>
+            </div>
+            <div class="text">
+              {{team.project_description}}
+              Members needed: {{team.members_needed}}
+              Num members: {{team.num_members}}
+              <div>
+                Tags:
+                <ul>
+                  {% for tag in team.tag_set.all %}
+                  <li>{{tag}}</li>
+                  {% endfor %}
+                <ul>
+              </div>
             </div>
           </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-      </div>
+      {% endif %}
     </div>
   </body>
 </html>
