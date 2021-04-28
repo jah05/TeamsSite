@@ -9,13 +9,16 @@ from django.contrib.auth import authenticate, login, logout
 loggedIn = True
 
 class IndexView(View):
-    allTeams = Team.objects.order_by("-members_needed")
 
     def get(self, request):
         user = request.user
+        if user.is_authenticated:
+            allTeams = user.team_set.all().order_by("-members_needed")
+        else:
+            allTeams = Team.objects.order_by("-members_needed")
         form = AuthenticationForm()
         context = {
-            'allTeams': self.allTeams,
+            'allTeams': allTeams,
             'form': form,
             'user': user
         }
@@ -35,9 +38,14 @@ class IndexView(View):
                 if user is not None:
                     login(request, user = user)
 
+        user = request.user
+        if user.is_authenticated:
+            allTeams = user.team_set.all().order_by("-members_needed")
+        else:
+            allTeams = Team.objects.order_by("-members_needed")
         context = {
             'form': form,
-            'allTeams': self.allTeams,
+            'allTeams': allTeams,
         }
 
         return render(request, "teamApp/index.html", context)
@@ -73,14 +81,16 @@ class MyTeamsView(View):
 class TeamView(View):
     def get(self, request, team_id):
         team = get_object_or_404(Team, pk=team_id)
-        members = team.user_set.all()
-        if request.user in members:
-            pass
-        else:
-            pass
+        members = User.objects.filter(team=team)
+        print(members)
         context = {
-            'team':team
+            'team':team,
+            'members': members
         }
+        if request.user in members:
+            context["isMember"] = True
+        else:
+            context["isMember"] = False
         return render(request, 'teamApp/team.html', context)
 
     def post(self, request):
