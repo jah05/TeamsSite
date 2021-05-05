@@ -118,6 +118,8 @@ class CreateView(View):
         return render(request, 'teamApp/create.html', context)
 
     def post(self, request):
+        tags = request.POST["tags"]
+        tags = tags.split(', ')
         newTeam = Team(
             project_name = request.POST["teamName"],
             members_needed = request.POST["membersNeeded"],
@@ -125,8 +127,11 @@ class CreateView(View):
         )
         newTeam.save()
         newTeam.members.add(request.user)
+
+        for tag in tags:
+            teamTag = TeamTag(name=tag, teamTagged=newTeam)
+            teamTag.save()
         return redirect('index')
-        # return IndexView.as_view()(self.request)
 
 class RecView(View):
     pass
