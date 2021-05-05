@@ -19,15 +19,22 @@ class Team(models.Model):
     members_needed = models.IntegerField(default=0)
     project_description = models.TextField(max_length=1000)
     members = models.ManyToManyField(User)
+
     # add photo
 
     def __str__(self):
         return self.project_name
 
-class Tag(models.Model):
+class UserTag(models.Model):
     name = models.CharField(max_length=100)
-    teamTagged = models.ForeignKey(Team, blank=True, on_delete=models.CASCADE)
     userTagged = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+class TeamTag(models.Model):
+    name = models.CharField(max_length = 100)
+    teamTagged = models.ForeignKey(Team, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

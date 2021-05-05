@@ -9,14 +9,36 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
-  <body>
-    <div>
+  <body class="container">
       <h1>Teams App</h1>
       {% if user.is_authenticated %}
       <form method="POST">
           {% csrf_token %}
           <input type="hidden" name="logout" value="logout"></input>
           <button type="submit" class="btn btn-primary">Logout</button>
+          <h3>Hi {{user.username}}! Here are your teams</h3>
+          <div class="row">
+            {% for team in userTeams %}
+            <div class="col-md-2">
+              <div class="text-primary row">
+                <a href="teams\{{team.id}}">{{team.project_name}}</a>
+              </div>
+              <div class="text">
+                {{team.project_description}}
+                Members needed: {{team.members_needed}}
+                Num members: {{team.num_members}}
+                <div>
+                  Tags:
+                  <ul>
+                    {% for tag in team.teamtag_set.all %}
+                    <li>{{tag}}</li>
+                    {% endfor %}
+                  <ul>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
       </form>
       {% else %}
         <form method="POST">
@@ -26,8 +48,8 @@
           </table>
           <button type="submit" class="btn btn-primary">Sign In</button>
         </form>
-        <h3>Here is a catalogue of teams that you might like</h3>
       {% endif %}
+      <h3>Here is a catalogue of teams that you might like</h3>
       <div class="row">
         {% for team in allTeams %}
         <div class="col-md-2">
@@ -41,7 +63,7 @@
             <div>
               Tags:
               <ul>
-                {% for tag in team.tag_set.all %}
+                {% for tag in team.teamtag_set.all %}
                 <li>{{tag}}</li>
                 {% endfor %}
               <ul>
@@ -50,6 +72,5 @@
         </div>
         {% endfor %}
       </div>
-    </div>
   </body>
 </html>
