@@ -9,6 +9,5 @@ urlpatterns = [
     path('teams/<int:team_id>', views.TeamView.as_view(), name='team profile'),
     path('teams/<int:team_id>/edit', views.EditTeamView.as_view(), name='edit team profile'),
     path('create', views.CreateView.as_view(), name='create'),
-    path('create/recs', views.RecView.as_view(), name="recommendations"),
     path('requests', views.RequestsView.as_view(), name="requests")
 ]

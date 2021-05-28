@@ -8,29 +8,70 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <script>
+      var limit = 5;
+      $('input.single-checkbox').on('change', function(evt) {
+         if($(this).siblings(':checked').length >= limit) {
+             this.checked = false;
+         }
+      });
+    </script>
   </head>
   <body class="container">
-    <h1>Create Team</h1>
-    <form method="post">
-      {% csrf_token %}
-      <label for="teamName">Team name: </label>
-      <input id="teamName" type="text" name="teamName"></input>
-      <br />
+    {% if not teamCreated %}
+      <h1>Create Team</h1>
+      <form method="post">
+        {% csrf_token %}
+        <label for="teamName">Team name: </label>
+        <input id="teamName" type="text" name="teamName"></input>
+        <br />
 
-      <label for="membersNeeded">Members needed: </label>
-      <input id="membersNeeded" type="number" name="membersNeeded"></input>
-      <br />
+        <label for="membersNeeded">Members needed: </label>
+        <input id="membersNeeded" type="number" name="membersNeeded"></input>
+        <br />
 
-      <label for="teamDescription">Team description: </label>
-      <br />
-      <textarea id="teamDescription" name="teamDescription" style="width:800px; height:300px"></textarea>
-      <br />
+        <label for="teamDescription">Team description: </label>
+        <br />
+        <textarea id="teamDescription" name="teamDescription" style="width:800px; height:300px"></textarea>
+        <br />
 
-      <label for="tags">Tags (separate with commas): </label>
-      <br />
-      <textarea id="tags" name="tags" style="width:800px; height:100px"></textarea>
-      <br />
-      <button type="submit" class="btn btn-primary">Create</button>
-    </form>
+        <label for="tags">Tags (separate with commas): </label>
+        <br />
+        <textarea id="tags" name="tags" style="width:800px; height:100px"></textarea>
+        <br />
+        <input id="teamCreated" name="teamCreated" type="hidden" value={{teamCreated}}></input>
+
+        <button type="submit" class="btn btn-primary">Create</button>
+      </form>
+    {% else %}
+      <form method="post">
+        {% csrf_token %}
+        <h4>Select Candidates</h4>
+        <table style="width:100%" class="table">
+          <tr>
+            <th>username</th>
+            <th>match%<th>
+            <th>tags<th>
+            <th>✔️</th>
+          </tr>
+          {% for c in recs %}
+          <tr>
+            <th>{{c.0.username}}<th>
+            <th>{{c.2}}</th>
+            <th>
+              {% for tag in c.0.usertag_set.all %}
+                |{{tag}}|
+              {% endfor %}
+            </th>
+            <th><input class="single-checkbox" type="checkbox" id={{forloop.counter}} name="candidates" value={{c.0.username}}></input></th>
+          </tr>
+          {% endfor %}
+        </table>
+        <input id="teamCreated" name="teamCreated" type="hidden" value={{teamCreated}}></input>
+        <input id="teamId" name="teamId" type="hidden" value={{teamId}}></input>
+        <button type="submit" class="btn-primary">Submit</button>
+      </form>
+    {% endif %}
   </body>
 <html>

@@ -5,8 +5,7 @@ from .models import Profile, Team, UserTag, TeamTag
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-
-loggedIn = True
+from django.contrib.auth.hashers import make_password
 
 class IndexView(View):
 
@@ -114,27 +113,69 @@ class CreateView(View):
             context["isAuthenticated"] = True
         else:
             context["isAuthenticated"] = True
-
+        context["teamCreated"] = False
         return render(request, 'teamApp/create.html', context)
 
     def post(self, request):
-        tags = request.POST["tags"]
-        tags = tags.split(', ')
-        newTeam = Team(
-            project_name = request.POST["teamName"],
-            members_needed = request.POST["membersNeeded"],
-            project_description = request.POST["teamDescription"]
-        )
-        newTeam.save()
-        newTeam.members.add(request.user)
+        if request.POST["teamCreated"] == "False":
+            tags = request.POST["tags"]
+            tags = tags.split(', ')
+            newTeam = Team(
+                project_name = request.POST["teamName"],
+                members_needed = request.POST["membersNeeded"],
+                project_description = request.POST["teamDescription"]
+            )
+            newTeam.save()
+            newTeam.members.add(request.user)
+            newTeam.num_members += 1
+            newTeam.save()
 
-        for tag in tags:
-            teamTag = TeamTag(name=tag, teamTagged=newTeam)
-            teamTag.save()
-        return redirect('index')
+            for tag in tags:
+                teamTag = TeamTag(name=tag, teamTagged=newTeam)
+                teamTag.save()
+            context = {"teamCreated": True}
 
-class RecView(View):
-    pass
+            candidates = []
+            for tag in tags:
+                # individual instances of tag for example multiple athlete tags
+                relevant_tags = UserTag.objects.filter(name=tag)
+                for t in relevant_tags:
+                    if (t.userTagged in candidates) == False:
+                        candidates.append(t.userTagged)
+
+            data = []
+            for candidate in candidates:
+                # [[c0, s0], [c1, s1],..., [cn-1, sn-1]]
+                score = self.score(candidate, tags);
+                try:
+                    data.append([candidate, score, score/len(tags) * 100])
+                except ZeroDivisionError:
+                    pass
+
+            data.sort(key=lambda x: x[1])
+            context["recs"] = data
+            context["numTags"] = len(tags)
+            context["teamId"] = newTeam.id
+
+            return render(request, 'teamApp/create.html', context)
+        else:
+            team = get_object_or_404(Team, pk=request.POST["teamId"])
+            c_list = request.POST.getlist('candidates')
+            for username in c_list:
+                if username != request.user.username:
+                    team.members.add(User.objects.get(username = username))
+                    team.num_members += 1
+                    team.save()
+            return redirect("index")
+
+    def score(self, candidate, teamTags):
+        score = 0
+        candidateTags = candidate.usertag_set.all()
+        for candidateTag in candidateTags:
+            if candidateTag.name in teamTags:
+                score += 1
+
+        return score
 
 class RequestsView(View):
     pass
