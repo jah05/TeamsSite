@@ -8,7 +8,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 
 class IndexView(View):
-
     def get(self, request):
         user = request.user
         allTeams = Team.objects.order_by("-members_needed")[:6]
@@ -112,7 +111,7 @@ class CreateView(View):
         if user.is_authenticated:
             context["isAuthenticated"] = True
         else:
-            context["isAuthenticated"] = True
+            return redirect("index")
         context["teamCreated"] = False
         return render(request, 'teamApp/create.html', context)
 

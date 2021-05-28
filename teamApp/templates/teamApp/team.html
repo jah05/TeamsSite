@@ -30,7 +30,7 @@
     </div>
     <ul>
       {% for member in members %}
-      <li>{{member.username}}</li>
+      <li><a href="{% url  'profile' member.username %}">{{member.username}}</a></li>
       {% endfor %}
     </ul>
   </body>

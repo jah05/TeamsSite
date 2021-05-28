@@ -24,7 +24,7 @@
     <div>teams</div>
     <ul>
       {% for team in profile.user.team_set.all %}
-      <li>{{team.project_name}}</li>
+      <li><a href="{% url  'team profile' team.id %}">{{team.project_name}}</a></li>
       {% endfor %}
     </ul>
   </body>
