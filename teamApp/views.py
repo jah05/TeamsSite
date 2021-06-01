@@ -11,10 +11,9 @@ class IndexView(View):
     def get(self, request):
         user = request.user
         allTeams = Team.objects.order_by("-members_needed")[:6]
-        form = AuthenticationForm()
+
         context = {
             'allTeams': allTeams,
-            'form': form,
             'user': user
         }
         if user.is_authenticated:
@@ -23,28 +22,41 @@ class IndexView(View):
         return render(request, 'teamApp/index.html', context)
 
     def post(self, request):
+        if 'login' in request.POST.keys():
+            return redirect("login")
+
         if 'logout' in request.POST.keys():
             logout(request)
-            form = AuthenticationForm()
-        else:
-            form = AuthenticationForm(data=request.POST)
-            if form.is_valid():
-                username = form.cleaned_data['username']
-                password = form.cleaned_data['password']
-                user = authenticate(username = username, password = password)
-                if user is not None:
-                    login(request, user = user)
 
         user = request.user
         allTeams = Team.objects.order_by("-members_needed")[:6]
         context = {
-            'form': form,
             'allTeams': allTeams,
         }
         if user.is_authenticated:
             context['userTeams'] = user.team_set.all().order_by("-members_needed")[:6]
 
         return render(request, "teamApp/index.html", context)
+
+class LoginView(View):
+    def get(self, request):
+        form = AuthenticationForm()
+        context = {'form':form, 'success':True}
+        return render(request, 'teamApp/login.html', context)
+
+    def post(self, request):
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username = username, password = password)
+            if user is not None:
+                login(request, user = user)
+                return redirect("index")
+        else:
+            form = AuthenticationForm()
+            context = {'form':form, 'success':False}
+            return render(request, 'teamApp/login.html', context)
 
 class ProfileView(View):
     def get(self, request, usr):

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'teamApp/style.css' %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -10,22 +12,19 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
-    <h1>Profile: {{user.username}}</h1>
-    <div>name: {{profile.name}}</div>
-    <div>age: {{profile.age}}</div>
-    <div>city: {{profile.city}}</div>
-    <div>bio: {{profile.bio}}</div>
-    <div>skills</div>
-    <ul>
-      {% for tag in profile.user.tag_set.all %}
-      <li>{{tag}}</li>
-      {% endfor %}
-    </ul>
-    <div>teams</div>
-    <ul>
-      {% for team in profile.user.team_set.all %}
-      <li><a href="{% url  'team profile' team.id %}">{{team.project_name}}</a></li>
-      {% endfor %}
-    </ul>
+    <div class="loginframe">
+      <form method="POST">
+        <div class="m-auto">
+          {% csrf_token %}
+          <table class="text-dark">
+            {{ form }}
+          </table>
+          {% if not success %}
+          <p style="color:red">*Log-in failed :( Try again</p>
+          {% endif %}
+          <button type="submit" class="btn btn-primary">Log In</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>

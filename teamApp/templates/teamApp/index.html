@@ -10,12 +10,34 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body class="container">
+    <div>
+      <!-- navigation bar -->
+      <nav class="navbar row navbar-expand-sm navbar-expand-md navbar-inverse navbar-dark bg-dark">
+          <a class="navbar-brand" href="index.html">
+              <span class="logo">Teams</span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
+              <li class="navbar-item">
+                  <form method="POST">
+                    {% csrf_token %}
+                    {% if user.is_authenticated %}
+                      <input type="hidden" name="logout" value="logout"></input>
+                      <button type="submit" class="btn btn-primary">Logout</button>
+                    {% else %}
+                      <input type="hidden" name="login" value="login"></input>
+                      <button type="submit" class="btn btn-primary">Log In</button>
+                    {% endif %}
+                  </form>
+              </li>
+          </ul>
+      </nav>
       <h1>Teams App</h1>
       {% if user.is_authenticated %}
       <form method="POST">
           {% csrf_token %}
-          <input type="hidden" name="logout" value="logout"></input>
-          <button type="submit" class="btn btn-primary">Logout</button>
           <h3>Hi {{user.username}}! Here are your teams</h3>
           <div class="row">
             {% for team in userTeams %}
@@ -40,14 +62,6 @@
             {% endfor %}
           </div>
       </form>
-      {% else %}
-        <form method="POST">
-          {% csrf_token %}
-          <table>
-            {{ form }}
-          </table>
-          <button type="submit" class="btn btn-primary">Sign In</button>
-        </form>
       {% endif %}
       <h3>Here is a catalogue of teams that you might like</h3>
       <div class="row">
@@ -72,5 +86,6 @@
         </div>
         {% endfor %}
       </div>
+    </div>
   </body>
 </html>
