@@ -26,6 +26,9 @@
                   <a href="{% url 'profile' user.username %}" class="nav-link">My Profile</a>
                 </li>
                 <li class="navbar-item">
+                  <a href="{% url 'teams' %}" class="nav-link">My Teams</a>
+                </li>
+                <li class="navbar-item">
                   <a href="{% url 'create' %}" class="nav-link">Create</a>
                 </li>
               {% endif %}

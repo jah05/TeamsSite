@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body class="container">
+    <h1>My Teams</h1>
+    <div class="row">
+      {% for team in allTeams %}
+      <div class="col-md-3">
+        <div class="text-primary">
+          <a href="{% url 'team profile' team.id%}">{{team.project_name}}</a>
+        </div>
+        <div class="text">
+          {{team.project_description}}
+          <br />
+          Members needed: {{team.members_needed}}
+          <br />
+          Num members: {{team.num_members}}
+          <div>
+            Tags:
+            <ul>
+              {% for tag in team.teamtag_set.all %}
+              <li>{{tag}}</li>
+              {% endfor %}
+            <ul>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  <body>
+</html>

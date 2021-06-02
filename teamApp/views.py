@@ -135,12 +135,11 @@ class ProfileView(View):
             context['tagStr'] = ', '.join(temp)
             return render(request, 'teamApp/profile.html', context)
 
-class EditProfileView(View):
-    pass
-
 class MyTeamsView(View):
-    # return HttpResponse("hello this is where the teams are")
-    pass
+    def get(self, request):
+        if request.user.is_authenticated:
+            context={'allTeams':request.user.team_set.all().order_by("-members_needed")}
+        return render(request, 'teamApp/myteams.html', context)
 
 class TeamView(View):
     """This view is responsible for the profile page"""
@@ -160,10 +159,6 @@ class TeamView(View):
         else:
             context["isMember"] = False
         return render(request, 'teamApp/team.html', context)
-
-class EditTeamView(View):
-    # return HttpResponse("hello this is the team editor for team %s" % team_id)
-    pass
 
 class CreateView(View):
     """This view is responsible for the create page"""
