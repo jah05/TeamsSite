@@ -23,6 +23,7 @@
     </ul>
     <div>teams</div>
     <ul>
+      <!-- link entry to team page -->
       {% for team in profile.user.team_set.all %}
       <li><a href="{% url  'team profile' team.id %}">{{team.project_name}}</a></li>
       {% endfor %}

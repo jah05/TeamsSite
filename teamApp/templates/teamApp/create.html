@@ -10,6 +10,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
     <script>
+      // limits the number of candidate selections to 5
       var limit = 5;
       $('input.single-checkbox').on('change', function(evt) {
          if($(this).siblings(':checked').length >= limit) {
@@ -20,6 +21,7 @@
   </head>
   <body class="container">
     {% if not teamCreated %}
+    <!-- check if team is created, if not display forms -->
       <h1>Create Team</h1>
       <form method="post">
         {% csrf_token %}
@@ -41,20 +43,24 @@
         <textarea id="tags" name="tags" style="width:800px; height:100px"></textarea>
         <br />
         <input id="teamCreated" name="teamCreated" type="hidden" value={{teamCreated}}></input>
+        <!-- pass back info to post function so that next iteration to go to the else code -->
 
         <button type="submit" class="btn btn-primary">Create</button>
       </form>
     {% else %}
+    <!-- once team is created go to choose candidate page -->
       <form method="post">
         {% csrf_token %}
         <h4>Select Candidates</h4>
         <table style="width:100%" class="table">
+          <!-- table with username | match % | tags % | select box -->
           <tr>
             <th>username</th>
             <th>match%<th>
             <th>tags<th>
             <th>✔️</th>
           </tr>
+          <!-- candidates loop -->
           {% for c in recs %}
           <tr>
             <th>{{c.0.username}}<th>
@@ -68,7 +74,9 @@
           </tr>
           {% endfor %}
         </table>
+        <!-- pass back info to post function for next iteration so that it knows to return to index -->
         <input id="teamCreated" name="teamCreated" type="hidden" value={{teamCreated}}></input>
+        <!-- pass team id to add members to right team -->
         <input id="teamId" name="teamId" type="hidden" value={{teamId}}></input>
         <button type="submit" class="btn-primary">Submit</button>
       </form>

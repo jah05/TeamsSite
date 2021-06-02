@@ -8,8 +8,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 
 class IndexView(View):
+    """
+    This view is responsible for the index page
+    """
     def get(self, request):
         user = request.user
+        # get teams that need members most from all teams
         allTeams = Team.objects.order_by("-members_needed")[:8]
 
         context = {
@@ -17,11 +21,13 @@ class IndexView(View):
             'user': user
         }
         if user.is_authenticated:
+            # these are teams that the user is part of
             context['userTeams'] = user.team_set.all().order_by("-members_needed")[:8]
 
         return render(request, 'teamApp/index.html', context)
 
     def post(self, request):
+        # check for login or logout request
         if 'login' in request.POST.keys():
             return redirect("login")
 
@@ -29,6 +35,7 @@ class IndexView(View):
             logout(request)
 
         user = request.user
+        # rebuild context for display again
         allTeams = Team.objects.order_by("-members_needed")[:10]
         context = {
             'allTeams': allTeams,
@@ -39,9 +46,12 @@ class IndexView(View):
         return render(request, "teamApp/index.html", context)
 
 class LoginView(View):
+    """This view is responsible for the login page"""
     def get(self, request):
+        # only allow login page if user isn't logged in
         if not request.user.is_authenticated:
             form = AuthenticationForm()
+            # success is used as a flag to see if log in was good
             context = {'form':form, 'success':True}
             return render(request, 'teamApp/login.html', context)
         else:
@@ -57,11 +67,13 @@ class LoginView(View):
                 login(request, user = user)
                 return redirect("index")
         else:
+            # if log in fails notify the page of failure and rebuild page
             form = AuthenticationForm()
             context = {'form':form, 'success':False}
             return render(request, 'teamApp/login.html', context)
 
 class ProfileView(View):
+    """This view is responsible for the profile page"""
     def get(self, request, usr):
         user = User.objects.get(username = usr)
         tags = user.usertag_set.all()
@@ -75,6 +87,7 @@ class ProfileView(View):
             'tags': tags
         }
         if request.user.username == usr:
+            # if user is owner of page
             context['isAuthenticated'] = True
             context['isProfileUser'] = True
         else:
@@ -97,53 +110,60 @@ class MyTeamsView(View):
     pass
 
 class TeamView(View):
+    """This view is responsible for the profile page"""
     def get(self, request, team_id):
         team = get_object_or_404(Team, pk=team_id)
         members = User.objects.filter(team=team)
+        # get tags of the team
         tags = team.teamtag_set.all()
         context = {
             'team':team,
             'members': members,
             'tags':tags
         }
+        # check if user is part of the team
         if request.user in members:
             context["isMember"] = True
         else:
             context["isMember"] = False
         return render(request, 'teamApp/team.html', context)
 
-    def post(self, request):
-        pass
-
 class EditTeamView(View):
     # return HttpResponse("hello this is the team editor for team %s" % team_id)
     pass
 
 class CreateView(View):
+    """This view is responsible for the create page"""
     def get(self, request):
         user = request.user
         context = {'user':user}
+        # only enable create page once user is logged in
         if user.is_authenticated:
             context["isAuthenticated"] = True
         else:
             return redirect("index")
+        # flag to tell post function whether to display the creation form or candidates
         context["teamCreated"] = False
         return render(request, 'teamApp/create.html', context)
 
     def post(self, request):
+        # if the user has entered data
         if request.POST["teamCreated"] == "False":
             tags = request.POST["tags"]
-            tags = tags.split(', ')
+            tags = tags.split(', ') # split tags up
             newTeam = Team(
                 project_name = request.POST["teamName"],
                 members_needed = request.POST["membersNeeded"],
                 project_description = request.POST["teamDescription"]
             )
             newTeam.save()
+
+            # change team attributes
             newTeam.members.add(request.user)
             newTeam.num_members += 1
             newTeam.save()
 
+            # save inputted tags
             for tag in tags:
                 teamTag = TeamTag(name=tag, teamTagged=newTeam)
                 teamTag.save()
@@ -151,31 +171,35 @@ class CreateView(View):
 
             candidates = []
             for tag in tags:
-                # individual instances of tag for example multiple athlete tags
+                # individual instances of tag, for example multiple athlete tags
                 relevant_tags = UserTag.objects.filter(name=tag)
                 for t in relevant_tags:
+                    # make sure no duplicate candidates
                     if (t.userTagged in candidates) == False:
                         candidates.append(t.userTagged)
 
             data = []
             for candidate in candidates:
-                # [[c0, s0], [c1, s1],..., [cn-1, sn-1]]
+                # [[c0, s0], [c1, s1],..., [cn-1, sn-1]] c-candidate s-score
                 score = self.score(candidate, tags);
+                # make sure it doesn't crash if no tags are added
                 try:
                     data.append([candidate, score, score/len(tags) * 100])
                 except ZeroDivisionError:
                     pass
 
-            data.sort(key=lambda x: x[1])
+            data.sort(key=lambda x: x[1]) # sort by score for usability
             context["recs"] = data
             context["numTags"] = len(tags)
             context["teamId"] = newTeam.id
 
             return render(request, 'teamApp/create.html', context)
         else:
+            # team is created and candidates are selected
             team = get_object_or_404(Team, pk=request.POST["teamId"])
             c_list = request.POST.getlist('candidates')
             for username in c_list:
+                # make sure creator isn't included twice
                 if username != request.user.username:
                     team.members.add(User.objects.get(username = username))
                     team.num_members += 1
@@ -192,14 +216,17 @@ class CreateView(View):
         return score
 
 class RegisterView(View):
+    """This view is responsible for the register page"""
     def get(self, request):
         return render(request, "teamApp/register.html", {'error':''})
 
     def post(self, request):
-        if request.POST["password"] == request.POST["cpassword"]:
+        if request.POST["password"] == request.POST["cpassword"]:   # check if passwords match
+            # look for blank fields
             if request.POST["username"]=='' or request.POST["email"]=='' or request.POST["password"]=='' or request.POST["name"]=='' or request.POST["age"]=='' or request.POST["city"]=='':
                 return render(request, "teamApp/register.html", {'error':"ERROR: fields not filled"})
             try:
+                # look for existing users
                 user = User.objects.get(username=request.POST["username"])
                 return render(request, "teamApp/register.html", {'error':"ERROR: username taken"})
             except:

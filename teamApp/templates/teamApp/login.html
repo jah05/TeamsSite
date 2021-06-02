@@ -15,12 +15,15 @@
         <div class="m-auto">
           {% csrf_token %}
           <table class="text-dark">
+            <!-- user authentication form -->
             {{ form }}
           </table>
           {% if not success %}
+          <!-- indicate log in failed -->
           <p style="color:red">*Log-in failed :( Try again</p>
           {% endif %}
           <button type="submit" class="btn btn-primary">Log In</button>
+          <!-- link to register -->
           <a href="{% url 'register' %}" class="btn btn-warning">Register</a>
         </div>
       </form>

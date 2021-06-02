@@ -20,14 +20,19 @@
               <span class="navbar-toggler-icon"></span>
           </button>
           <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
+              <!-- if user logged in enable create option -->
               {% if user.is_authenticated %}
-                <li class="navbar-item navbar-link">
-                  <a href="{% url 'create' %}">Create</a>
+                <li class="navbar-item">
+                  <a href="{% url 'profile' user.username %}" class="nav-link">My Profile</a>
+                </li>
+                <li class="navbar-item">
+                  <a href="{% url 'create' %}" class="nav-link">Create</a>
                 </li>
               {% endif %}
               <li class="navbar-item ml-auto">
                   <form method="POST">
                     {% csrf_token %}
+                    <!-- determine if button is login or logout -->
                     {% if user.is_authenticated %}
                       <input type="hidden" name="logout" value="logout"></input>
                       <button type="submit" class="btn btn-primary">Logout</button>
@@ -40,11 +45,13 @@
           </ul>
       </nav>
       <h1>Teams App</h1>
+      <!-- only include user's teams if logged in -->
       {% if user.is_authenticated %}
       <form method="POST">
           {% csrf_token %}
           <h3>Hi {{user.username}}! Here are your teams</h3>
           <div class="row">
+            <!-- print info for all relevant teams -->
             {% for team in userTeams %}
             <div class="col-md-3">
               <div class="text-primary">

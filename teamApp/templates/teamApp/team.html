@@ -10,6 +10,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body class=container>
+    <!-- team profile -->
     <a href="{% url 'index' %}"> home </a>
     <div>
       Team Name: {{team.project_name}}
@@ -29,6 +30,7 @@
       {% endif %}
     </div>
     <ul>
+      <!-- link to all member profiles -->
       {% for member in members %}
       <li><a href="{% url  'profile' member.username %}">{{member.username}}</a></li>
       {% endfor %}
