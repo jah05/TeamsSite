@@ -10,18 +10,50 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
-    <h1>Profile: {{user.username}}</h1>
-    <div>name: {{profile.name}}</div>
-    <div>age: {{profile.age}}</div>
-    <div>city: {{profile.city}}</div>
-    <div>bio: {{profile.bio}}</div>
-    <div>skills</div>
-    <ul>
-      {% for tag in profile.user.tag_set.all %}
-      <li>{{tag}}</li>
-      {% endfor %}
-    </ul>
-    <div>teams</div>
+    <!-- if the page is not in edit mode -->
+    {% if not edit %}
+      <h1>Profile: {{user.username}}</h1>
+      <div>Name: {{profile.name}}</div>
+      <div>Age: {{profile.age}}</div>
+      <div>City: {{profile.city}}</div>
+      <div>Bio: {{profile.bio}}</div>
+      <div>Tags</div>
+      <ul>
+        {% for tag in tags %}
+        <li>{{tag.name}}</li>
+        {% endfor %}
+      </ul>
+      {% if isAuthenticated and isProfileUser %}
+        <form method="POST">
+          {% csrf_token %}
+          <!-- to signify that edit has been activated -->
+          <input type="hidden" id="edit" name="edit" value="edit"></input>
+          <button type="submit" class="btn btn-warning">Edit</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <form method="POST">
+        {% csrf_token %}
+        <label for="nInput">Name:</label>
+        <input id="nInput" type="text" name="nInput" value={{profile.name}}></input>
+        <br />
+        <label for="aInput">Age:</label>
+        <input id="aInput" type="number" name="aInput" value={{profile.age}}></input>
+        <br />
+        <label for="cInput">City:</label>
+        <input id="cInput" type="text" name="cInput" value={{profile.city}}></input>
+        <br />
+        <label for="bInput">Bio:</label>
+        <textarea id="bInput" name="bInput" style="width:800px; height:100px" maxlength=1024>{{profile.bio}}</textarea>
+        <br />
+        <label for="tags">Tags (separate with commas): </label>
+        <br />
+        <textarea id="tags" name="tags" style="width:800px; height:100px" maxlength=1024>{{tagStr}}</textarea>
+        <br />
+        <button type="submit" class="btn btn-warning" value="editsubmit" name="editsubmit">Submit</button>
+      </form>
+    {% endif %}
+    <div>Teams</div>
     <ul>
       <!-- link entry to team page -->
       {% for team in profile.user.team_set.all %}

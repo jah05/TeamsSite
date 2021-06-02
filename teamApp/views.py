@@ -84,23 +84,56 @@ class ProfileView(View):
             'profile': profile,
             'user': user,
             'teams': teams,
-            'tags': tags
+            'tags': tags,
+            'edit': False,
         }
-        if request.user.username == usr:
-            # if user is owner of page
-            context['isAuthenticated'] = True
-            context['isProfileUser'] = True
-        else:
-            if request.user.is_authenticated:
-                # if the viewer is logged in but not page owner
-                context['isAuthenticated'] = True
-                context['isProfileUser'] = False
-            else:
-                # if the viewer is not logged in
-                context['isAuthenticated'] = False
-                context['isProfileUser'] = False
-
+        context['isAuthenticated'] = request.user.is_authenticated
+        context['isProfileUser'] = request.user.username==usr
         return render(request, 'teamApp/profile.html', context)
+
+    def post(self, request, usr):
+        user = User.objects.get(username = usr)
+        profile = get_object_or_404(Profile, pk=user)
+
+        # if the edit is submitted
+        if 'editsubmit' in request.POST.keys():
+            profile.name = request.POST["nInput"]
+            profile.age = request.POST["aInput"]
+            profile.city = request.POST["cInput"]
+            profile.bio = request.POST["bInput"]
+            tags = request.POST["tags"]
+            tags = tags.split(', ')
+
+            # delete old tags
+            ogTags = user.usertag_set.all()
+            for tag in ogTags:
+                tag.delete()
+
+            for tag in tags:
+                userTag = UserTag(name=tag, userTagged=user)
+                userTag.save()
+
+            profile.save()
+            return self.get(request, usr)
+        # otherwise check for edit button or display normally
+        else:
+            tags = user.usertag_set.all()
+            teams = user.team_set.all().order_by("-members_needed")
+
+            context = {
+                'profile': profile,
+                'user': user,
+                'teams': teams,
+                'tags': tags,
+                'edit': 'edit' in request.POST.keys(),
+            }
+            context['isAuthenticated'] = request.user.is_authenticated
+            context['isProfileUser'] = request.user.username==usr
+            temp = []
+            for tag in tags:
+                temp.append(tag.name)
+            context['tagStr'] = ', '.join(temp)
+            return render(request, 'teamApp/profile.html', context)
 
 class EditProfileView(View):
     pass
@@ -204,7 +237,7 @@ class CreateView(View):
                     team.members.add(User.objects.get(username = username))
                     team.num_members += 1
                     team.save()
-            return redirect("index")
+            return redirect("team profile", team.id)
 
     def score(self, candidate, teamTags):
         score = 0
