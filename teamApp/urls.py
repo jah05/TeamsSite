@@ -9,6 +9,7 @@ urlpatterns = [
     path('teams/<int:team_id>', views.TeamView.as_view(), name='team profile'),
     path('teams/<int:team_id>/edit', views.EditTeamView.as_view(), name='edit team profile'),
     path('login', views.LoginView.as_view(), name="login"),
+    path('register', views.RegisterView.as_view(), name="register"),
     path('create', views.CreateView.as_view(), name='create'),
     path('requests', views.RequestsView.as_view(), name="requests")
 ]

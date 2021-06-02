@@ -10,14 +10,14 @@ from django.contrib.auth.hashers import make_password
 class IndexView(View):
     def get(self, request):
         user = request.user
-        allTeams = Team.objects.order_by("-members_needed")[:6]
+        allTeams = Team.objects.order_by("-members_needed")[:8]
 
         context = {
             'allTeams': allTeams,
             'user': user
         }
         if user.is_authenticated:
-            context['userTeams'] = user.team_set.all().order_by("-members_needed")[:6]
+            context['userTeams'] = user.team_set.all().order_by("-members_needed")[:8]
 
         return render(request, 'teamApp/index.html', context)
 
@@ -29,20 +29,23 @@ class IndexView(View):
             logout(request)
 
         user = request.user
-        allTeams = Team.objects.order_by("-members_needed")[:6]
+        allTeams = Team.objects.order_by("-members_needed")[:10]
         context = {
             'allTeams': allTeams,
         }
         if user.is_authenticated:
-            context['userTeams'] = user.team_set.all().order_by("-members_needed")[:6]
+            context['userTeams'] = user.team_set.all().order_by("-members_needed")[:8]
 
         return render(request, "teamApp/index.html", context)
 
 class LoginView(View):
     def get(self, request):
-        form = AuthenticationForm()
-        context = {'form':form, 'success':True}
-        return render(request, 'teamApp/login.html', context)
+        if not request.user.is_authenticated:
+            form = AuthenticationForm()
+            context = {'form':form, 'success':True}
+            return render(request, 'teamApp/login.html', context)
+        else:
+            return redirect('index')
 
     def post(self, request):
         form = AuthenticationForm(data=request.POST)
@@ -187,6 +190,34 @@ class CreateView(View):
                 score += 1
 
         return score
+
+class RegisterView(View):
+    def get(self, request):
+        return render(request, "teamApp/register.html", {'error':''})
+
+    def post(self, request):
+        if request.POST["password"] == request.POST["cpassword"]:
+            if request.POST["username"]=='' or request.POST["email"]=='' or request.POST["password"]=='' or request.POST["name"]=='' or request.POST["age"]=='' or request.POST["city"]=='':
+                return render(request, "teamApp/register.html", {'error':"ERROR: fields not filled"})
+            try:
+                user = User.objects.get(username=request.POST["username"])
+                return render(request, "teamApp/register.html", {'error':"ERROR: username taken"})
+            except:
+                user=User.objects.create(username=request.POST["username"], password=make_password(request.POST["password"]), email=request.POST["email"])
+                user.save()
+                login(request, user)
+
+                profile = Profile(user=user, city=request.POST["city"], name=request.POST["name"], age=int(request.POST["age"]), bio=request.POST["bio"])
+                profile.save()
+
+                tags = request.POST["tags"].split(', ')
+                for tag in tags:
+                    userTag = UserTag(name=tag, userTagged=user)
+                    userTag.save()
+
+                return redirect("index")
+        else:
+            return render(request, "teamApp/register.html", {'error':"ERROR: passwords do not match"})
 
 class RequestsView(View):
     pass

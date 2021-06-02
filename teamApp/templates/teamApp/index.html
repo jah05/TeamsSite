@@ -13,14 +13,19 @@
     <div>
       <!-- navigation bar -->
       <nav class="navbar row navbar-expand-sm navbar-expand-md navbar-inverse navbar-dark bg-dark">
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="{% url 'index' %}">
               <span class="logo">Teams</span>
           </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
               <span class="navbar-toggler-icon"></span>
           </button>
           <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
-              <li class="navbar-item">
+              {% if user.is_authenticated %}
+                <li class="navbar-item navbar-link">
+                  <a href="{% url 'create' %}">Create</a>
+                </li>
+              {% endif %}
+              <li class="navbar-item ml-auto">
                   <form method="POST">
                     {% csrf_token %}
                     {% if user.is_authenticated %}
@@ -41,8 +46,8 @@
           <h3>Hi {{user.username}}! Here are your teams</h3>
           <div class="row">
             {% for team in userTeams %}
-            <div class="col-md-2">
-              <div class="text-primary row">
+            <div class="col-md-3">
+              <div class="text-primary">
                 <a href="teams\{{team.id}}">{{team.project_name}}</a>
               </div>
               <div class="text">
@@ -66,13 +71,15 @@
       <h3>Here is a catalogue of teams that you might like</h3>
       <div class="row">
         {% for team in allTeams %}
-        <div class="col-md-2">
-          <div class="text-primary row">
+        <div class="col-md-3">
+          <div class="text-primary">
             <a href="teams\{{team.id}}">{{team.project_name}}</a>
           </div>
           <div class="text">
             {{team.project_description}}
+            <br />
             Members needed: {{team.members_needed}}
+            <br />
             Num members: {{team.num_members}}
             <div>
               Tags:
