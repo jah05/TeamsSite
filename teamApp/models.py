@@ -14,7 +14,7 @@ class Profile(models.Model):
         return self.name
 
 class Team(models.Model):
-    project_name = models.CharField(max_length=64, default="Untitled")
+    project_name = models.CharField(max_length=200, default="Untitled")
     num_members = models.IntegerField(default=0)
     members_needed = models.IntegerField(default=0)
     project_description = models.TextField(max_length=1000)

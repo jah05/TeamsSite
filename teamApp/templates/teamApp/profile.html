@@ -9,20 +9,43 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
-  <body>
+  <body class="container">
+    <nav class="navbar row navbar-expand-sm navbar-expand-md navbar-inverse navbar-dark bg-dark">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <span class="logo">Teams</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
+            <!-- if user logged in enable create option -->
+            {% if viewer.is_authenticated %}
+              <li class="navbar-item">
+                <a href="{% url 'profile' viewer.username %}" class="nav-link">My Profile</a>
+              </li>
+              <li class="navbar-item">
+                <a href="{% url 'teams' %}" class="nav-link">My Teams</a>
+              </li>
+              <li class="navbar-item">
+                <a href="{% url 'create' %}" class="nav-link">Create</a>
+              </li>
+            {% endif %}
+        </ul>
+    </nav>
     <!-- if the page is not in edit mode -->
     {% if not edit %}
-      <h1>Profile: {{user.username}}</h1>
+      <h1>Profile: {{page_user.username}}</h1>
       <div>Name: {{profile.name}}</div>
       <div>Age: {{profile.age}}</div>
       <div>City: {{profile.city}}</div>
       <div>Bio: {{profile.bio}}</div>
-      <div>Tags</div>
-      <ul>
+      <div>
+        Tags
         {% for tag in tags %}
-        <li>{{tag.name}}</li>
+        <span class="badge badge-pill badge-info">{{tag.name}}</span>
         {% endfor %}
-      </ul>
+      </div>
+      <br />
       {% if isAuthenticated and isProfileUser %}
         <form method="POST">
           {% csrf_token %}

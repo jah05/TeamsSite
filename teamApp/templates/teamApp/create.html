@@ -26,7 +26,7 @@
       <form method="post">
         {% csrf_token %}
         <label for="teamName">Team name: </label>
-        <input id="teamName" type="text" name="teamName"></input>
+        <input id="teamName" type="text" name="teamName" maxlength=200></input>
         <br />
 
         <label for="membersNeeded">Members needed: </label>

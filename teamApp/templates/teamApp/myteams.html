@@ -10,6 +10,28 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
   <body class="container">
+    <nav class="navbar row navbar-expand-sm navbar-expand-md navbar-inverse navbar-dark bg-dark">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <span class="logo">Teams</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
+            <!-- if user logged in enable create option -->
+            {% if user.is_authenticated %}
+              <li class="navbar-item">
+                <a href="{% url 'profile' user.username %}" class="nav-link">My Profile</a>
+              </li>
+              <li class="navbar-item">
+                <a href="{% url 'teams' %}" class="nav-link">My Teams</a>
+              </li>
+              <li class="navbar-item">
+                <a href="{% url 'create' %}" class="nav-link">Create</a>
+              </li>
+            {% endif %}
+        </ul>
+    </nav>
     <h1>My Teams</h1>
     <div class="row">
       {% for team in allTeams %}
@@ -25,11 +47,9 @@
           Num members: {{team.num_members}}
           <div>
             Tags:
-            <ul>
-              {% for tag in team.teamtag_set.all %}
-              <li>{{tag}}</li>
-              {% endfor %}
-            <ul>
+            {% for tag in team.teamtag_set.all %}
+            <span class="badge badge-pill badge-info">{{tag}}</span>
+            {% endfor %}
           </div>
         </div>
       </div>

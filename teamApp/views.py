@@ -82,7 +82,8 @@ class ProfileView(View):
 
         context = {
             'profile': profile,
-            'user': user,
+            'page_user':usr,
+            'viewer': request.user,
             'teams': teams,
             'tags': tags,
             'edit': False,
@@ -138,7 +139,8 @@ class ProfileView(View):
 class MyTeamsView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            context={'allTeams':request.user.team_set.all().order_by("-members_needed")}
+            context={'allTeams':request.user.team_set.all().order_by("-members_needed"),
+            'user':request.user}
         return render(request, 'teamApp/myteams.html', context)
 
 class TeamView(View):
@@ -151,14 +153,58 @@ class TeamView(View):
         context = {
             'team':team,
             'members': members,
-            'tags':tags
+            'tags':tags,
+            'edit':False
         }
         # check if user is part of the team
-        if request.user in members:
-            context["isMember"] = True
-        else:
-            context["isMember"] = False
+        context["isMember"] = request.user in members
         return render(request, 'teamApp/team.html', context)
+
+    def post(self, request, team_id):
+        team = get_object_or_404(Team, pk=team_id)
+        members = User.objects.filter(team=team)
+        tags = team.teamtag_set.all()
+        if 'editsubmit' in request.POST.keys():
+            if 'dropdown' in request.POST.keys():
+                team.num_members += 1
+                team.members.add(User.objects.get(username=request.POST["dropdown"]))
+            team.project_name = request.POST["nInput"]
+            team.members_needed = request.POST["mInput"]
+            team.project_description = request.POST["dInput"]
+
+            tags = request.POST["tags"]
+            tags = tags.split(', ')
+
+            # delete old tags
+            ogTags = team.teamtag_set.all()
+            for tag in ogTags:
+                tag.delete()
+
+            for tag in tags:
+                teamTag = TeamTag(name=tag, teamTagged=team)
+                teamTag.save()
+            team.save()
+            return self.get(request, team_id)
+        elif 'delete' in request.POST.keys():
+            team.delete()
+            return redirect('index')
+        else:
+            context = {
+                'team':team,
+                'members': members,
+                'tags':tags,
+                'edit': 'edit' in request.POST.keys()
+            }
+
+            candidates = User.objects.all().difference(members)
+            context["candidates"] = candidates
+            # check if user is part of the team
+            context["isMember"] = request.user in members
+            temp = []
+            for tag in tags:
+                temp.append(tag.name)
+            context['tagStr'] = ', '.join(temp)
+            return render(request, 'teamApp/team.html', context)
 
 class CreateView(View):
     """This view is responsible for the create page"""
@@ -216,7 +262,7 @@ class CreateView(View):
                 except ZeroDivisionError:
                     pass
 
-            data.sort(key=lambda x: x[1]) # sort by score for usability
+            data.sort(key=lambda x: x[1], reverse=True) # sort by score for usability
             context["recs"] = data
             context["numTags"] = len(tags)
             context["teamId"] = newTeam.id
@@ -273,6 +319,3 @@ class RegisterView(View):
                 return redirect("index")
         else:
             return render(request, "teamApp/register.html", {'error':"ERROR: passwords do not match"})
-
-class RequestsView(View):
-    pass

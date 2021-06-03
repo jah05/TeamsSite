@@ -11,19 +11,88 @@
   </head>
   <body class=container>
     <!-- team profile -->
-    <a href="{% url 'index' %}"> home </a>
-    <div>
-      Team Name: {{team.project_name}}
-    </div>
-    <div>
-      Descritpion: {{team.project_description}}
-    </div>
-    <div>
-      Num Members: {{team.num_members}}
-    </div>
-    <div>
-      Members Needed: {{team.members_needed}}
-    </div>
+    <nav class="navbar row navbar-expand-sm navbar-expand-md navbar-inverse navbar-dark bg-dark">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <span class="logo">Teams</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
+            <!-- if user logged in enable create option -->
+            {% if user.is_authenticated %}
+              <li class="navbar-item">
+                <a href="{% url 'profile' user.username %}" class="nav-link">My Profile</a>
+              </li>
+              <li class="navbar-item">
+                <a href="{% url 'teams' %}" class="nav-link">My Teams</a>
+              </li>
+              <li class="navbar-item">
+                <a href="{% url 'create' %}" class="nav-link">Create</a>
+              </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% if not edit %}
+      <div>
+        Team Name: {{team.project_name}}
+      </div>
+      <div>
+        Description: {{team.project_description}}
+      </div>
+      <div>
+        Num Members: {{team.num_members}}
+      </div>
+      <div>
+        Members Needed: {{team.members_needed}}
+      </div>
+      <div>
+        Tag
+        {% for tag in tags %}
+        <span class="badge badge-pill badge-info">{{tag.name}}</span>
+        {% endfor %}
+      </div>
+      <br />
+      {% if isMember %}
+        <form method="POST">
+          {% csrf_token %}
+          <!-- to signify that edit has been activated -->
+          <input type="hidden" id="edit" name="edit" value="edit"></input>
+          <button type="submit" class="btn btn-warning">Edit</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <form method="POST">
+        {% csrf_token %}
+        <label for="nInput">Team Name:</label>
+        <input id="nInput" type="text" name="nInput" value={{team.project_name}}></input>
+        <br />
+        <label for="mInput">Members Needed:</label>
+        <input id="mInput" type="number" name="mInput" value={{team.members_needed}}></input>
+        <br />
+        <label for="dInput">Description:</label>
+        <br />
+        <textarea id="dInput" name="dInput" style="width:800px; height:100px" maxlength=1024>{{team.project_description}}</textarea>
+        <br />
+        <label for="tags">Tags (separate with commas): </label>
+        <br />
+        <textarea id="tags" name="tags" style="width:800px; height:100px" maxlength=1024>{{tagStr}}</textarea>
+        <br />
+        <label for="dropdown">*Optional</label>
+        <br />
+        <select class="form-select" aria-label="Default select example" name="dropdown" id="dropdown">
+          <option selected="selected" disabled>--Add member--</option>
+          {% for candidate in candidates%}
+            <option value={{candidate.username}}>{{candidate.username}}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-warning" value="editsubmit" name="editsubmit">Submit</button>
+        <span>&nbsp;</span>
+        <button type="submit" class="btn btn-danger" value="delete" name="delete">Delete</button>
+      </form>
+    {% endif %}
     <div>
       {% if isMember %}
       Hi you are a member of this team

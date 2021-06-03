@@ -61,18 +61,17 @@
                 <a href="teams\{{team.id}}">{{team.project_name}}</a>
               </div>
               <div class="text">
-                {{team.project_description}}
-                Members needed: {{team.members_needed}}
-                Num members: {{team.num_members}}
+                <div>{{team.project_description}}</div>
+                <div>Members needed: {{team.members_needed}}</div>
+                <div>Num members: {{team.num_members}}</div>
                 <div>
                   Tags:
-                  <ul>
-                    {% for tag in team.teamtag_set.all %}
-                    <li>{{tag}}</li>
-                    {% endfor %}
-                  <ul>
+                  {% for tag in team.teamtag_set.all %}
+                  <span class="badge badge-pill badge-info">{{tag}}</span>
+                  {% endfor %}
                 </div>
               </div>
+              <br />
             </div>
             {% endfor %}
           </div>
@@ -93,13 +92,12 @@
             Num members: {{team.num_members}}
             <div>
               Tags:
-              <ul>
-                {% for tag in team.teamtag_set.all %}
-                <li>{{tag}}</li>
-                {% endfor %}
-              <ul>
+              {% for tag in team.teamtag_set.all %}
+              <span class="badge badge-pill badge-info">{{tag}}</span>
+              {% endfor %}
             </div>
           </div>
+          <br />
         </div>
         {% endfor %}
       </div>
