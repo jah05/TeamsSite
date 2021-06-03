@@ -1,6 +1,6 @@
 # TeamsSite
 Website/App that finds you a team/group to do certain activities.
-The url to open the website is http://localhost:8000/app/
+The url to open the website is http://localhost:8000/app/.
 To sign up an account, go to log in and there will be an option.
 
 Some extra features that i've included are
