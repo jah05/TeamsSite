@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    # profile_picture = models.ImageField()
     city = models.CharField(max_length=64)
     name = models.CharField(max_length=64, default="Unnamed")
     bio = models.TextField(max_length=1024, default='')
@@ -20,8 +19,6 @@ class Team(models.Model):
     project_description = models.TextField(max_length=1000)
     members = models.ManyToManyField(User)
 
-    # add photo
-
     def __str__(self):
         return self.project_name
 
@@ -33,7 +30,7 @@ class UserTag(models.Model):
         return self.name
 
 class TeamTag(models.Model):
-    name = models.CharField(max_length = 100)
+    name = models.CharField(max_length=100)
     teamTagged = models.ForeignKey(Team, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):

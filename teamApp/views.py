@@ -196,6 +196,7 @@ class TeamView(View):
                 'edit': 'edit' in request.POST.keys()
             }
 
+            # find difference between sets, which gives out users not in the team
             candidates = User.objects.all().difference(members)
             context["candidates"] = candidates
             # check if user is part of the team
