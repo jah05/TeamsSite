@@ -11,5 +11,5 @@ Some extra features that i've included are
 
 Hope you'd enjoy!
 
-Final commit at: https://github.com/jah05/TeamsSite/tree/955628951561c43b6837dcd26fb35c8a16b3121d
+Final commit at: https://github.com/jah05/TeamsSite/tree/955628951561c43b6837dcd26fb35c8a16b3121d<br />
 Commit ID: 6b3121d
